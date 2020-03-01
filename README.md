@@ -21,3 +21,12 @@ You can add, delete, update and visualize contacts.
 To add a new contact, press the button in the right corner "Add contact"
 
 ![Contact List App panel](tutorial/screenshots/contactlist1.png)
+
+After that, a new page where you can add a new contact will appear:
+
+
+![Add a new contact](tutorial/screenshots/contactlist2.png)
+
+You can also edit and or delete by using the buttons "Edit" and "Delete" in each card from the main contact list.
+
+
