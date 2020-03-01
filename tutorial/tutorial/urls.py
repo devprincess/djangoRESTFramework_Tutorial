@@ -17,15 +17,16 @@ from django.contrib import admin
 
 from django.urls import include, path
 from rest_framework import routers
-from quickstart import views
-from contacts import views
+from quickstart import views as quickstartviews
 
 router = routers.DefaultRouter()
-#router.register(r'contacts', views.ContactViewSet)
-#router.register(r'users', views.UserViewSet)
-#router.register(r'groups', views.GroupViewSet)
+
+router.register(r'users', quickstartviews.UserViewSet)
+router.register(r'groups', quickstartviews.GroupViewSet)
+
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('', include('contacts.urls')),
- #   path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    #path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

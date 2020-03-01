@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 
@@ -8,46 +8,70 @@ from rest_framework.parsers import JSONParser
 from contacts.models import Contact
 from contacts.serializers import ContactSerializer
 from rest_framework import status
+from django.http import Http404
+from rest_framework.views import APIView
+from contacts.forms import ContactCreate
 
 
-@api_view(['GET', 'POST'])
-def contact_list(request, format=None):
+class ContactList(APIView):
     """
     List all contacts, or create a new contact.
     """
-    if request.method == 'GET':
+
+    def get(self, request, format=None):
         contacts = Contact.objects.all()
         serializer = ContactSerializer(contacts, many=True)
-        return Response(serializer.data)
-    
-    elif request.method == 'POST':
-        serializer = ContactSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        #return Response(serializer.data)
+        return render(request, 'contacts/contact_list.html', {'contactlist': contacts})
 
-@api_view(['GET', 'PUT','DELETE'])
-def contact_detail(request, pk, format=None):
+    def post(request):
+        serializer = ContactCreate()
+        if request.method == 'POST':
+            serializer = ContactCreate(request.POST)
+            if serializer.is_valid():
+                serializer.save()
+                return redirect('index')
+            else:
+                return HttpResponse("""your form is wrong, reload on <a href="{{ url: 'index' }}">reload</a>""")
+                #return Response(serializer.data, status=status.HTTP_201_CREATED)
+            #return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return render(request, 'contacts/upload_contact.html', {'upload_contact': serializer})
+
+
+class ContactDetail(APIView):
     """
     Retrieve, update or delete a contact.
     """
-    try:
-        contact = Contact.objects.get(pk=pk)
-    except Contact.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = ContacttSerializer(snippet)
+    def get_object(self, pk):
+        try:
+            return Contact.objects.get(pk=pk)
+        except Contact.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        contact = self.get_object(pk)
+        serializer = ContactSerializer(contact)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = ContactSerializer(snippet, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(request, contact_id):
+        contact_id = int(contact_id)
+        try:
+            contact_sel = Contact.objects.get(id = contact_id)
+        except Contact.DoesNotExist:
+            return redirect('index')
+        contact_form = ContactCreate(request.POST or None, instance = contact_sel)
+        if contact_form.is_valid():
+            contact_form.save()
+            return redirect('index')
+        return render(request, 'contacts/upload_contact.html', {'upload_contact': contact_form})
 
-    elif request.method == 'DELETE':
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(request, contact_id):
+        contact_id = int(contact_id)
+        try:
+            contact_sel = Contact.objects.get(id = contact_id)
+        except Contact.DoesNotExist:
+            return redirect('index')
+        contact_sel.delete()
+        return redirect('index')
