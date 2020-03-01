@@ -1,6 +1,6 @@
 # Django REST framework project: Contact list
 
-CRUD for a Contact list
+CRUD application for a Contact list.
 
 ## Setup to run the application
 
