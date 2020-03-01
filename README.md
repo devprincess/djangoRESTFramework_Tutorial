@@ -15,3 +15,9 @@ CRUD application for a Contact list.
 - The application will start in `PORT = 8000` in `localhost`.
 
 You can add, delete, update and visualize contacts. 
+
+## How to use the application
+
+To add a new contact, press the button in the right corner "Add contact"
+
+![Contact List App panel](screenshots/contactlist1.png)
